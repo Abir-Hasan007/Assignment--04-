@@ -1,0 +1,7 @@
+# Assinment 4 process :
+-----------------------
+1. Convert ui/ux to html. C
+2. Api calling .C
+3. Card information looping.C
+4. Search algorithm in api.C
+5. View details card by meal id.C

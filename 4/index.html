@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thatix Cooking Recipe</title>
+    <link rel="stylesheet" href="./style/style.css">
+</head>
+<body>
+   
+        <div class="banner"> 
+             <div class="logo">
+                <img src="./image/logo.png" alt="">
+            </div>
+        </div>
+  
+    <header>
+
+        <h1>Search Your Favorite Recipe</h1>
+        <p>A handful of simple ingredients typify the fresh, vibrant flavors of Greek cooking</p>
+        
+        <div class="search-container">
+            <input class = 'search' type="text" placeholder="Search...">
+            <button class="search-btn">🔍</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">Latest Recipes</h2>
+        
+        <div class="recipe-grid">
+          
+        </div>
+    </div>
+     <div id="popupContainer" class="popup-overlay">
+       
+    </div>
+    <footer>
+        <div class="footer-content">
+            <p>Copyright © 2023 - All right reserved</p>
+            <div class="social-icons">
+                <span>Twitter</span>
+                <span>YouTube</span>
+                <span>Facebook</span>
+            </div>
+        </div>
+    </footer>
+ <script type="module">// when colnsole type module needed
+
+    
+//  #.......................Start-card-looping for all food's.........................
+
+    const apiurl = 'https://www.themealdb.com/api/json/v1/1/search.php?s='
+    const response = await fetch(apiurl)
+    const data = await response.json()
+    const mealsArray = data.meals//meals array length ar upor bitti kora array loop korba.
+    const recipe =  document.querySelector('.recipe-grid')//recipe card ka dora hoisa 
+    // queryselector ar maddoma id ba class dila appendchild usekorta hoba.
+    recipe.innerHTML = " "//dianamic value asba tai faka raka hoisa.
+
+   
+ mealsArray.forEach(item => {
+   
+    const card = document.createElement('div');
+    card.classList.add('card');
+
+   
+    card.innerHTML = `
+        <img src="${item.strMealThumb}" alt="${item.strMeal}" class="card-img">
+        <div class="card-content">
+            <h3>${item.strMeal}</h3>
+            <p>${item.strInstructions.substring(0, 100)}...</p>
+            <button class="view-btn">VIEW DETAILS</button>
+        </div>
+    `;
+
+    card.querySelector('.view-btn').addEventListener('click', () => {
+        openPopup(item.idMeal); 
+    });
+
+    recipe.appendChild(card);
+});
+    
+//  #.......................End-card-looping for all food's.........................
+
+//  #.......................Start-search-card for all food's.........................
+
+
+const searchBtn = document.querySelector('.search-btn');
+const searchInput = document.querySelector('.search');
+
+
+async function getdata() {
+    const foodname = searchInput.value;
+    const apiurl = `https://www.themealdb.com/api/json/v1/1/search.php?s=${foodname}`;
+    
+    try {
+        const response = await fetch(apiurl);
+        const data = await response.json();
+        const mealsArray = data.meals
+        const recipe =  document.querySelector('.recipe-grid')
+        recipe.innerHTML = " "
+        mealsArray.forEach(item => {
+   
+    const card = document.createElement('div');
+    card.classList.add('card');
+
+   
+    card.innerHTML = `
+        <img src="${item.strMealThumb}" alt="${item.strMeal}" class="card-img">
+        <div class="card-content">
+            <h3>${item.strMeal}</h3>
+            <p>${item.strInstructions.substring(0, 100)}...</p>
+            <button class="view-btn">VIEW DETAILS</button>
+        </div>
+    `;
+
+    card.querySelector('.view-btn').addEventListener('click', () => {
+        openPopup(item.idMeal); 
+    });
+
+    recipe.appendChild(card);
+});
+    
+ 
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+}
+
+// // 3. Listen for the click event properly
+searchBtn.addEventListener('click', getdata);
+//  #.......................End-search-card for all food's.........................
+
+//  #.......................start-view-card for all food's.........................
+
+const popcontainer = document.querySelector('#popupContainer');
+
+async function openPopup(id) {
+   
+    popcontainer.innerHTML = ""; 
+    popcontainer.style.display = 'block';
+
+    const apiurl = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`;
+
+    try {
+        const response = await fetch(apiurl);
+        const data = await response.json();
+        const meal = data.meals[0];
+
+       
+        const popupContent = document.createElement('div');
+        popupContent.classList.add('popup-content');
+
+       
+        const closeBtn = document.createElement('span');
+        closeBtn.classList.add('close-btn');
+        closeBtn.innerHTML = '&times;'; 
+        closeBtn.addEventListener('click', closePopup);
+
+    
+        const mealImg = document.createElement('img');
+        mealImg.src = meal.strMealThumb;
+        mealImg.style.width = "80%"; 
+        mealImg.style.borderRadius = "10px";
+
+      
+        const title = document.createElement('h2');
+        title.id = 'modalTitle';
+        title.textContent = meal.strMeal;
+
+       
+        const description = document.createElement('p');
+        description.id = 'modalDescription';
+        description.textContent = meal.strInstructions;
+        description.style.maxHeight = '200px';
+        description.style.overflowY = 'auto';
+
+       
+        popupContent.appendChild(closeBtn);
+        popupContent.appendChild(mealImg);
+        popupContent.appendChild(title);
+        popupContent.appendChild(description);
+
+      
+        popcontainer.appendChild(popupContent);
+
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        popcontainer.innerHTML = `<div class="popup-content">Error loading details.</div>`;
+    }
+} 
+function closePopup() {
+    popcontainer.style.display = 'none';
+}
+//  #.......................End-view-card for all food's.........................
+</script>
+</body>
+</html>
